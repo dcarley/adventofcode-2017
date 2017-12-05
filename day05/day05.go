@@ -7,6 +7,26 @@ import (
 )
 
 func Part1(input []byte) (int, error) {
+	offsetFunc := func(offset int) int {
+		return 1
+	}
+
+	return bothParts(input, offsetFunc)
+}
+
+func Part2(input []byte) (int, error) {
+	offsetFunc := func(offset int) int {
+		if offset >= 3 {
+			return -1
+		}
+
+		return 1
+	}
+
+	return bothParts(input, offsetFunc)
+}
+
+func bothParts(input []byte, offsetFunc func(int) int) (int, error) {
 	var steps, position int
 
 	instructions, err := ParseInstructions(input)
@@ -16,7 +36,7 @@ func Part1(input []byte) (int, error) {
 
 	for position >= 0 && position < len(instructions) {
 		offset := instructions[position]
-		instructions[position]++
+		instructions[position] += offsetFunc(offset)
 		position = position + offset
 		steps++
 	}
