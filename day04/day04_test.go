@@ -40,4 +40,34 @@ var _ = Describe("Day04", func() {
 			Expect(valid).To(Equal(325))
 		})
 	})
+	Describe("Part2", func() {
+		DescribeTable("examples",
+			func(input []byte, expected bool) {
+				Expect(Part2(input)).To(Equal(expected))
+			},
+			Entry("abcde fghij", []byte("abcde fghij"), true),
+			Entry("abcde xyz ecdab", []byte("abcde xyz ecdab"), false),
+			Entry("a ab abc abd abf abj", []byte("a ab abc abd abf abj"), true),
+			Entry("iiii oiii ooii oooi oooo", []byte("iiii oiii ooii oooi oooo"), true),
+			Entry("oiii ioii iioi iiio", []byte("oiii ioii iioi iiio"), false),
+		)
+
+		It("should solve puzzle input", func() {
+			var valid int
+
+			file, err := os.Open("day04.input")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			lineScanner := bufio.NewScanner(file)
+			for lineScanner.Scan() {
+				if Part2(lineScanner.Bytes()) {
+					valid++
+				}
+			}
+
+			Expect(lineScanner.Err()).ToNot(HaveOccurred())
+			Expect(valid).To(Equal(119))
+		})
+	})
 })
