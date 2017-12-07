@@ -30,11 +30,18 @@ func Part1(targetValue int) int {
 			sideLength++
 		}
 
-		bearing := side % 4
-		for moves := 0; moves < sideLength && cellValue < targetValue; moves++ {
-			cellValue++
-			position = Move(position, bearing, 1)
+		var moves int
+		if cellValue+sideLength <= targetValue {
+			// jump to next corner
+			moves = sideLength
+		} else {
+			// jump to target value
+			moves = targetValue - cellValue
 		}
+
+		bearing := side % 4
+		position = Move(position, bearing, moves)
+		cellValue += moves
 	}
 
 	// calculate manhatten distance
