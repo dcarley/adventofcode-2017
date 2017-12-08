@@ -38,4 +38,21 @@ var _ = Describe("Day06", func() {
 			Expect(Part1(bank)).To(Equal(6681))
 		})
 	})
+
+	Describe("Part2", func() {
+		It("should solve example", func() {
+			Expect(Part2([]int{0, 2, 7, 0})).To(Equal(4))
+		})
+
+		It("should solve puzzle input", func() {
+			file, err := os.Open("day06.input")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			bank, err := Parse(file)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(Part2(bank)).To(Equal(2392))
+		})
+	})
 })

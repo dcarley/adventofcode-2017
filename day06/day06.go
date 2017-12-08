@@ -8,24 +8,34 @@ import (
 )
 
 func Part1(bank []int) int {
-	var (
-		rounds    int
-		duplicate bool
-	)
+	return bothParts(bank, false)
+}
 
-	prevBanks := map[string]struct{}{}
-	prevBanks[fmt.Sprintf("%v", bank)] = struct{}{}
+func Part2(bank []int) int {
+	return bothParts(bank, true)
+}
 
-	for !duplicate {
+func bothParts(bank []int, returnDiff bool) int {
+	var rounds, prevRound int
+
+	prevBanks := map[string]int{
+		fmt.Sprintf("%v", bank): 1,
+	}
+
+	for prevRound == 0 {
 		rounds++
 		bank = Rebalance(bank)
 
 		key := fmt.Sprintf("%v", bank)
-		if _, exists := prevBanks[key]; exists {
-			duplicate = true
+		if round, exists := prevBanks[key]; exists {
+			prevRound = round
 			break
 		}
-		prevBanks[key] = struct{}{}
+		prevBanks[key] = rounds
+	}
+
+	if returnDiff {
+		return rounds - prevRound
 	}
 
 	return rounds
