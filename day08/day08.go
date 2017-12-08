@@ -72,6 +72,15 @@ func CheckCondition(a, b int, operator string) bool {
 }
 
 func Part1(input io.Reader) (int, error) {
+	return bothParts(input, false)
+}
+
+func Part2(input io.Reader) (int, error) {
+	return bothParts(input, true)
+}
+
+func bothParts(input io.Reader, returnHighestEver bool) (int, error) {
+	var highestEver int
 	registers := map[string]int{}
 
 	scanner := bufio.NewScanner(input)
@@ -92,11 +101,19 @@ func Part1(input io.Reader) (int, error) {
 			case "dec":
 				registers[instruction.Register] -= instruction.Value
 			}
+
+			if val := registers[instruction.Register]; val > highestEver {
+				highestEver = val
+			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
 		return 0, err
+	}
+
+	if returnHighestEver {
+		return highestEver, nil
 	}
 
 	var highest int
