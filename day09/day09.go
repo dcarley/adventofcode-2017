@@ -15,9 +15,21 @@ const (
 )
 
 func Part1(input io.Reader) (int, error) {
+	score, _, err := bothParts(input)
+
+	return score, err
+}
+
+func Part2(input io.Reader) (int, error) {
+	_, garbage, err := bothParts(input)
+
+	return garbage, err
+}
+
+func bothParts(input io.Reader) (score int, garbage int, err error) {
 	var (
-		depth, score int
-		garbage      bool
+		depth     int
+		inGarbage bool
 	)
 
 	scanner := bufio.NewScanner(input)
@@ -30,15 +42,16 @@ func Part1(input io.Reader) (int, error) {
 			continue
 		}
 
-		if garbage && !bytes.ContainsRune(token, GarbageClose) {
+		if inGarbage && !bytes.ContainsRune(token, GarbageClose) {
+			garbage++
 			continue
 		}
 
 		switch {
 		case bytes.ContainsRune(token, GarbageOpen):
-			garbage = true
+			inGarbage = true
 		case bytes.ContainsRune(token, GarbageClose):
-			garbage = false
+			inGarbage = false
 		case bytes.ContainsRune(token, GroupOpen):
 			depth++
 		case bytes.ContainsRune(token, GroupClose):
@@ -47,5 +60,5 @@ func Part1(input io.Reader) (int, error) {
 		}
 	}
 
-	return score, scanner.Err()
+	return score, garbage, scanner.Err()
 }
