@@ -1,5 +1,9 @@
 package day10
 
+import (
+	"encoding/hex"
+)
+
 func Part1(list, lengths []int) int {
 	var position int
 
@@ -10,6 +14,31 @@ func Part1(list, lengths []int) int {
 	}
 
 	return list[0] * list[1]
+}
+
+func Part2(list []int, lengths []byte) string {
+	suffix := []byte{17, 31, 73, 47, 23}
+	lengths = append(lengths, suffix...)
+
+	var position, skip int
+	for i := 0; i < 64; i++ {
+		for _, length := range lengths {
+			ReverseSublistWrapped(list, position, int(length))
+
+			position += int(length) + skip
+			position %= len(list)
+			skip++
+		}
+	}
+
+	denseHash := make([]byte, 16)
+	for denseBlock := 0; denseBlock < len(denseHash); denseBlock++ {
+		for i := 0; i < len(denseHash); i++ {
+			denseHash[denseBlock] ^= byte(list[denseBlock*16+i])
+		}
+	}
+
+	return hex.EncodeToString(denseHash)
 }
 
 func ReverseSublistWrapped(list []int, position, length int) {
