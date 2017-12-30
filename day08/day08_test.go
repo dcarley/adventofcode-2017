@@ -102,7 +102,7 @@ c inc -20 if c == 10`))
 
 			highest, err := Part2(file)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(highest).To(Equal(-1))
+			Expect(highest).To(Equal(7774))
 		})
 	})
 })
