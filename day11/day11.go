@@ -7,20 +7,31 @@ import (
 )
 
 func Part1(path string) (int, error) {
-	var (
-		position Position
-		err      error
-	)
+	final, _, err := bothParts(path)
+	return final, err
+}
 
+func Part2(path string) (int, error) {
+	_, furthest, err := bothParts(path)
+	return furthest, err
+}
+
+func bothParts(path string) (final, furthest int, err error) {
+	var position Position
 	path = strings.TrimSpace(path)
+
 	for _, direction := range strings.Split(path, ",") {
 		position, err = Move(position, direction)
 		if err != nil {
-			return 0, err
+			return
+		}
+		if dist := Distance(Position{}, position); dist > furthest {
+			furthest = dist
 		}
 	}
 
-	return Distance(Position{}, position), nil
+	final = Distance(Position{}, position)
+	return
 }
 
 type Position struct {

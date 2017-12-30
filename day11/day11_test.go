@@ -33,4 +33,15 @@ var _ = Describe("Day11", func() {
 			Expect(distance).To(Equal(643))
 		})
 	})
+
+	Describe("Part2", func() {
+		It("should solve puzzle input", func() {
+			path, err := ioutil.ReadFile("day11.input")
+			Expect(err).ToNot(HaveOccurred())
+
+			distance, err := Part2(string(path))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(distance).To(Equal(1471))
+		})
+	})
 })
