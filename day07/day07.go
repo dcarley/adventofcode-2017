@@ -8,77 +8,23 @@ import (
 )
 
 type Node struct {
-	Parent string
-	Weight int
+	Name     string
+	Weight   int
+	Parent   *Node
+	Children []*Node
 }
 
-type Nodes map[string]Node
+func (n Node) Balance() (int, *Node) {
+	branchWeights := map[int][]*Node{}
 
-func Parse(input io.Reader) (Nodes, string, error) {
-	nodes := Nodes{}
-
-	scanner := bufio.NewScanner(input)
-	for scanner.Scan() {
-		line := strings.SplitN(scanner.Text(), " ", 4)
-		name := line[0]
-
-		weight, err := strconv.Atoi(strings.Trim(line[1], "()"))
-		if err != nil {
-			return Nodes{}, "", err
+	for _, node := range n.Children {
+		branchWeight, unbalanced := node.Balance()
+		if unbalanced != nil {
+			return 0, unbalanced
 		}
 
-		if node, exists := nodes[name]; exists {
-			node.Weight = weight
-			nodes[name] = node
-		} else {
-			nodes[name] = Node{
-				Weight: weight,
-			}
-		}
-
-		if len(line) > 2 {
-			for _, child := range strings.Split(line[3], ", ") {
-				if node, exists := nodes[child]; exists {
-					node.Parent = name
-					nodes[child] = node
-				} else {
-					nodes[child] = Node{
-						Parent: name,
-					}
-				}
-			}
-		}
-	}
-
-	var root string
-	for name, node := range nodes {
-		if node.Parent == "" {
-			root = name
-			break
-		}
-	}
-
-	return nodes, root, scanner.Err()
-}
-
-type UnbalancedNode struct {
-	Name   string
-	Weight int
-}
-
-func TraverseChildren(nodes Nodes, parent string) (int, *UnbalancedNode) {
-	branchWeights := map[int][]string{}
-
-	for name, node := range nodes {
-		if node.Parent == parent {
-			branchWeight, unbalanced := TraverseChildren(nodes, name)
-			if unbalanced != nil {
-				return 0, unbalanced
-			}
-
-			branchWeight += node.Weight
-			branchWeights[branchWeight] = append(branchWeights[branchWeight], name)
-		}
+		branchWeight += node.Weight
+		branchWeights[branchWeight] = append(branchWeights[branchWeight], node)
 	}
 
 	var sum, correctWeight, incorrectWeight int
@@ -94,34 +40,74 @@ func TraverseChildren(nodes Nodes, parent string) (int, *UnbalancedNode) {
 	}
 
 	if incorrectWeight != 0 {
-		name := branchWeights[incorrectWeight][0]
-		correction := incorrectWeight - correctWeight
+		unbalanced := branchWeights[incorrectWeight][0]
+		unbalanced.Weight -= (incorrectWeight - correctWeight)
 
-		return 0, &UnbalancedNode{
-			Name:   name,
-			Weight: nodes[name].Weight - correction,
-		}
+		return 0, unbalanced
 	}
 
 	return sum, nil
 }
 
+func Parse(input io.Reader) (*Node, error) {
+	nodes := map[string]*Node{}
+
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		line := strings.SplitN(scanner.Text(), " ", 4)
+		name := line[0]
+
+		weight, err := strconv.Atoi(strings.Trim(line[1], "()"))
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := nodes[name]; !ok {
+			nodes[name] = &Node{Name: name}
+		}
+		node := nodes[name]
+		node.Weight = weight
+
+		if len(line) > 2 {
+			for _, childName := range strings.Split(line[3], ", ") {
+				if _, ok := nodes[childName]; !ok {
+					nodes[childName] = &Node{Name: childName}
+				}
+
+				child := nodes[childName]
+				child.Parent = node
+				node.Children = append(node.Children, child)
+			}
+		}
+	}
+
+	var root *Node
+	for _, node := range nodes {
+		if node.Parent == nil {
+			root = node
+			break
+		}
+	}
+
+	return root, scanner.Err()
+}
+
 func Part1(input io.Reader) (string, error) {
-	_, root, err := Parse(input)
+	root, err := Parse(input)
 	if err != nil {
 		return "", err
 	}
 
-	return root, nil
+	return root.Name, nil
 }
 
 func Part2(input io.Reader) (string, int, error) {
-	nodes, root, err := Parse(input)
+	root, err := Parse(input)
 	if err != nil {
 		return "", 0, err
 	}
 
-	_, unbalanced := TraverseChildren(nodes, root)
+	_, unbalanced := root.Balance()
 
 	return unbalanced.Name, unbalanced.Weight, nil
 }
