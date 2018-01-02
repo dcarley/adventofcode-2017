@@ -7,26 +7,14 @@ import (
 )
 
 func Part1(input io.Reader) (int, error) {
-	offsetFunc := func(offset int) int {
-		return 1
-	}
-
-	return bothParts(input, offsetFunc)
+	return bothParts(input, false)
 }
 
 func Part2(input io.Reader) (int, error) {
-	offsetFunc := func(offset int) int {
-		if offset >= 3 {
-			return -1
-		}
-
-		return 1
-	}
-
-	return bothParts(input, offsetFunc)
+	return bothParts(input, true)
 }
 
-func bothParts(input io.Reader, offsetFunc func(int) int) (int, error) {
+func bothParts(input io.Reader, part2 bool) (int, error) {
 	var steps, position int
 
 	instructions, err := ParseInstructions(input)
@@ -36,7 +24,12 @@ func bothParts(input io.Reader, offsetFunc func(int) int) (int, error) {
 
 	for position >= 0 && position < len(instructions) {
 		offset := instructions[position]
-		instructions[position] += offsetFunc(offset)
+		if part2 && offset >= 3 {
+			instructions[position] -= 1
+		} else {
+			instructions[position] += 1
+		}
+
 		position = position + offset
 		steps++
 	}
