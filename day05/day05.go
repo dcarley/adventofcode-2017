@@ -2,11 +2,11 @@ package day05
 
 import (
 	"bufio"
-	"bytes"
+	"io"
 	"strconv"
 )
 
-func Part1(input []byte) (int, error) {
+func Part1(input io.Reader) (int, error) {
 	offsetFunc := func(offset int) int {
 		return 1
 	}
@@ -14,7 +14,7 @@ func Part1(input []byte) (int, error) {
 	return bothParts(input, offsetFunc)
 }
 
-func Part2(input []byte) (int, error) {
+func Part2(input io.Reader) (int, error) {
 	offsetFunc := func(offset int) int {
 		if offset >= 3 {
 			return -1
@@ -26,7 +26,7 @@ func Part2(input []byte) (int, error) {
 	return bothParts(input, offsetFunc)
 }
 
-func bothParts(input []byte, offsetFunc func(int) int) (int, error) {
+func bothParts(input io.Reader, offsetFunc func(int) int) (int, error) {
 	var steps, position int
 
 	instructions, err := ParseInstructions(input)
@@ -44,10 +44,10 @@ func bothParts(input []byte, offsetFunc func(int) int) (int, error) {
 	return steps, nil
 }
 
-func ParseInstructions(input []byte) ([]int, error) {
-	instructions := make([]int, 0, bytes.Count(input, []byte{'\n'}))
+func ParseInstructions(input io.Reader) ([]int, error) {
+	instructions := []int{}
 
-	scanner := bufio.NewScanner(bytes.NewBuffer(input))
+	scanner := bufio.NewScanner(input)
 	for scanner.Scan() {
 		offset, err := strconv.Atoi(scanner.Text())
 		if err != nil {
