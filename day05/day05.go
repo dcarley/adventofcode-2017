@@ -1,9 +1,8 @@
 package day05
 
 import (
-	"bufio"
+	"fmt"
 	"io"
-	"strconv"
 )
 
 func Part1(input io.Reader) (int, error) {
@@ -40,18 +39,17 @@ func bothParts(input io.Reader, part2 bool) (int, error) {
 func ParseInstructions(input io.Reader) ([]int, error) {
 	instructions := []int{}
 
-	scanner := bufio.NewScanner(input)
-	for scanner.Scan() {
-		offset, err := strconv.Atoi(scanner.Text())
+	for {
+		var offset int
+		_, err := fmt.Fscanf(input, "%d\n", &offset)
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return []int{}, err
 		}
 
 		instructions = append(instructions, offset)
-	}
-
-	if err := scanner.Err(); err != nil {
-		return []int{}, err
 	}
 
 	return instructions, nil

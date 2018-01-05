@@ -1,11 +1,8 @@
 package day08
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"strconv"
-	"strings"
 )
 
 type Condition struct {
@@ -19,37 +16,6 @@ type Instruction struct {
 	Action    string
 	Value     int
 	Condition Condition
-}
-
-func ParseInstruction(line string) (Instruction, error) {
-	raw := strings.Split(line, " ")
-	if len(raw) != 7 || raw[3] != "if" {
-		return Instruction{}, fmt.Errorf("invalid instruction: %s", raw)
-	}
-
-	// <register> <action> <value> if <register> <operator> <value>
-	instruction := Instruction{
-		Register: raw[0],
-		Action:   raw[1],
-		Condition: Condition{
-			Register: raw[4],
-			Operator: raw[5],
-		},
-	}
-
-	instVal, err := strconv.Atoi(raw[2])
-	if err != nil {
-		return Instruction{}, err
-	}
-	instruction.Value = instVal
-
-	condVal, err := strconv.Atoi(raw[6])
-	if err != nil {
-		return Instruction{}, err
-	}
-	instruction.Condition.Value = condVal
-
-	return instruction, nil
 }
 
 func CheckCondition(a, b int, operator string) bool {
@@ -83,9 +49,19 @@ func bothParts(input io.Reader, returnHighestEver bool) (int, error) {
 	var highestEver int
 	registers := map[string]int{}
 
-	scanner := bufio.NewScanner(input)
-	for scanner.Scan() {
-		instruction, err := ParseInstruction(scanner.Text())
+	for {
+		instruction := Instruction{}
+		_, err := fmt.Fscanf(input, "%s %s %d if %s %s %d\n",
+			&instruction.Register,
+			&instruction.Action,
+			&instruction.Value,
+			&instruction.Condition.Register,
+			&instruction.Condition.Operator,
+			&instruction.Condition.Value,
+		)
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return 0, err
 		}
@@ -106,10 +82,6 @@ func bothParts(input io.Reader, returnHighestEver bool) (int, error) {
 				highestEver = val
 			}
 		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return 0, err
 	}
 
 	if returnHighestEver {

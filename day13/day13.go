@@ -1,11 +1,8 @@
 package day13
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"strconv"
-	"strings"
 )
 
 type Firewall []int
@@ -13,18 +10,12 @@ type Firewall []int
 func NewFirewall(input io.Reader) (Firewall, error) {
 	var firewall Firewall
 
-	scanner := bufio.NewScanner(input)
-	for scanner.Scan() {
-		line := strings.Split(scanner.Text(), ": ")
-		if len(line) != 2 {
-			return firewall, fmt.Errorf("unable to parse: %s", scanner.Text())
+	for {
+		var layerDepth, layerRange int
+		_, err := fmt.Fscanf(input, "%d: %d\n", &layerDepth, &layerRange)
+		if err == io.EOF {
+			break
 		}
-
-		layerDepth, err := strconv.Atoi(line[0])
-		if err != nil {
-			return firewall, err
-		}
-		layerRange, err := strconv.Atoi(line[1])
 		if err != nil {
 			return firewall, err
 		}
@@ -37,7 +28,7 @@ func NewFirewall(input io.Reader) (Firewall, error) {
 		firewall = append(firewall, layerRange)
 	}
 
-	return firewall, scanner.Err()
+	return firewall, nil
 }
 
 func (f Firewall) Scan(delay int, earlyAbort bool) (severity int, caught bool) {
