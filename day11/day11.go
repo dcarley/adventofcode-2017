@@ -21,58 +21,58 @@ func bothParts(path string) (final, furthest int, err error) {
 	path = strings.TrimSpace(path)
 
 	for _, direction := range strings.Split(path, ",") {
-		position, err = Move(position, direction)
+		err = position.Move(direction)
 		if err != nil {
 			return
 		}
-		if dist := Distance(Position{}, position); dist > furthest {
+		if dist := position.Distance(Position{0, 0, 0}); dist > furthest {
 			furthest = dist
 		}
 	}
 
-	final = Distance(Position{}, position)
+	final = position.Distance(Position{0, 0, 0})
 	return
-}
-
-type Position struct {
-	X, Y, Z int
 }
 
 func abs(v int) int {
 	return int(math.Abs(float64(v)))
 }
 
+type Position struct {
+	X, Y, Z int
+}
+
 // https://www.redblobgames.com/grids/hexagons/#distances-cube
-func Distance(a, b Position) int {
-	return (abs(a.X-b.X) + abs(a.Y-b.Y) + abs(a.Z-b.Z)) / 2
+func (p Position) Distance(to Position) int {
+	return (abs(p.X-to.X) + abs(p.Y-to.Y) + abs(p.Z-to.Z)) / 2
 }
 
 // https://www.redblobgames.com/grids/hexagons/#coordinates-cube
-func Move(position Position, direction string) (Position, error) {
+func (p *Position) Move(direction string) error {
 	var err error
 
 	switch direction {
 	case "n":
-		position.Y++
-		position.Z--
+		p.Y++
+		p.Z--
 	case "ne":
-		position.X++
-		position.Z--
+		p.X++
+		p.Z--
 	case "se":
-		position.Y--
-		position.X++
+		p.Y--
+		p.X++
 	case "s":
-		position.Y--
-		position.Z++
+		p.Y--
+		p.Z++
 	case "sw":
-		position.X--
-		position.Z++
+		p.X--
+		p.Z++
 	case "nw":
-		position.Y++
-		position.X--
+		p.Y++
+		p.X--
 	default:
 		err = fmt.Errorf("invalid direction: %s", direction)
 	}
 
-	return position, err
+	return err
 }

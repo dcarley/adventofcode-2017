@@ -15,6 +15,40 @@ type Position struct {
 	X, Y int
 }
 
+func (p *Position) Move(bearing, moves int) {
+	switch bearing {
+	case BearNorth:
+		p.Y -= moves
+	case BearEast:
+		p.X += moves
+	case BearSouth:
+		p.Y += moves
+	case BearWest:
+		p.X -= moves
+	}
+}
+
+func (p Position) Neighbours() []Position {
+	neighbours := []int{-1, 0, 1}
+	positions := make([]Position, 0, len(neighbours)^2-1)
+
+	for _, xOffset := range neighbours {
+		for _, yOffset := range neighbours {
+			// ignore centre (self)
+			if xOffset == 0 && yOffset == 0 {
+				continue
+			}
+
+			positions = append(positions, Position{
+				X: p.X + xOffset,
+				Y: p.Y + yOffset,
+			})
+		}
+	}
+
+	return positions
+}
+
 func Part1(targetValue int) int {
 	var (
 		side, sideLength int
@@ -40,7 +74,7 @@ func Part1(targetValue int) int {
 		}
 
 		bearing := side % 4
-		position = Move(position, bearing, moves)
+		position.Move(bearing, moves)
 		cellValue += moves
 	}
 
@@ -70,11 +104,11 @@ func Part2(targetAfterValue int) int {
 
 		bearing := side % 4
 		for moves := 0; moves < sideLength && cellValue <= targetAfterValue; moves++ {
-			position = Move(position, bearing, 1)
+			position.Move(bearing, 1)
 
 			// sum neighbours
 			cellValue = 0
-			for _, neighbour := range Neighbours(position) {
+			for _, neighbour := range position.Neighbours() {
 				if val, ok := cells[neighbour]; ok {
 					cellValue += val
 				}
@@ -85,40 +119,4 @@ func Part2(targetAfterValue int) int {
 	}
 
 	return cellValue
-}
-
-func Move(position Position, bearing, moves int) Position {
-	switch bearing {
-	case BearNorth:
-		position.Y -= moves
-	case BearEast:
-		position.X += moves
-	case BearSouth:
-		position.Y += moves
-	case BearWest:
-		position.X -= moves
-	}
-
-	return position
-}
-
-func Neighbours(position Position) []Position {
-	neighbours := []int{-1, 0, 1}
-	positions := make([]Position, 0, len(neighbours)^2-1)
-
-	for _, xOffset := range neighbours {
-		for _, yOffset := range neighbours {
-			// ignore centre (self)
-			if xOffset == 0 && yOffset == 0 {
-				continue
-			}
-
-			positions = append(positions, Position{
-				X: position.X + xOffset,
-				Y: position.Y + yOffset,
-			})
-		}
-	}
-
-	return positions
 }

@@ -11,7 +11,8 @@ import (
 var _ = Describe("Day03", func() {
 	DescribeTable("Move",
 		func(bearing int, expected Position) {
-			position := Move(Position{0, 0}, bearing, 3)
+			position := Position{0, 0}
+			position.Move(bearing, 3)
 			Expect(position).To(Equal(expected))
 		},
 		Entry("north", BearNorth, Position{0, -3}),
@@ -22,7 +23,7 @@ var _ = Describe("Day03", func() {
 
 	DescribeTable("Neighbours",
 		func(position Position, expected []Position) {
-			Expect(Neighbours(position)).To(Equal(expected))
+			Expect(position.Neighbours()).To(Equal(expected))
 		},
 		Entry("0,0", Position{0, 0}, []Position{
 			{-1, -1}, {-1, 0}, {-1, 1},
