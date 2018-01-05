@@ -54,7 +54,7 @@ var _ = Describe("Day13", func() {
 
 			res, err := Part2(file)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(res).To(Equal(-1))
+			Expect(res).To(Equal(3896406))
 		})
 	})
 })

@@ -8,37 +8,7 @@ import (
 	"strings"
 )
 
-type Layer struct {
-	Range     int
-	Position  int
-	Direction int
-}
-
-func (l *Layer) Advance() {
-	if l.Range == 0 {
-		return
-	}
-
-	switch l.Position {
-	case 0:
-		l.Direction = +1
-	case l.Range - 1:
-		l.Direction = -1
-	}
-
-	l.Position += l.Direction
-}
-
-func (l Layer) Caught() bool {
-	return l.Range > 0 && l.Position == 0
-}
-
-func (l *Layer) Reset() {
-	l.Position = 0
-	l.Direction = 0
-}
-
-type Firewall []*Layer
+type Firewall []int
 
 func NewFirewall(input io.Reader) (Firewall, error) {
 	var firewall Firewall
@@ -61,43 +31,30 @@ func NewFirewall(input io.Reader) (Firewall, error) {
 
 		// pad for missing layers
 		for i := len(firewall); i < layerDepth; i++ {
-			firewall = append(firewall, nil)
+			firewall = append(firewall, 0)
 		}
 
-		firewall = append(firewall, &Layer{Range: layerRange})
+		firewall = append(firewall, layerRange)
 	}
 
 	return firewall, scanner.Err()
 }
 
-func (f Firewall) Scan(earlyAbort bool) (severity int, caught bool) {
-	for position := 0; position < len(f); position++ {
-		for depth, layer := range f {
-			if layer == nil {
-				continue
+func (f Firewall) Scan(delay int, earlyAbort bool) (severity int, caught bool) {
+	for depth, layerRange := range f {
+		picoSecond := delay + depth
+		// https://en.wikipedia.org/wiki/Triangle_wave
+		if layerRange > 0 && picoSecond%(layerRange*2-2) == 0 {
+			if earlyAbort {
+				return 0, true
 			}
 
-			if position == depth && layer.Caught() {
-				if earlyAbort {
-					return 0, true
-				}
-				caught = true
-				severity += depth * layer.Range
-			}
-
-			layer.Advance()
+			caught = true
+			severity += picoSecond * layerRange
 		}
 	}
 
 	return
-}
-
-func (f Firewall) Reset() {
-	for _, layer := range f {
-		if layer != nil {
-			layer.Reset()
-		}
-	}
 }
 
 func Part1(input io.Reader) (int, error) {
@@ -106,7 +63,7 @@ func Part1(input io.Reader) (int, error) {
 		return 0, err
 	}
 
-	severity, _ := firewall.Scan(false)
+	severity, _ := firewall.Scan(0, false)
 
 	return severity, nil
 }
@@ -117,20 +74,13 @@ func Part2(input io.Reader) (int, error) {
 		return 0, err
 	}
 
-	var delay int
-	for {
+	var (
+		delay  int
+		caught bool = true
+	)
+	for caught {
 		delay++
-		firewall.Reset()
-
-		fmt.Println("delay:", delay)
-		for i := 0; i < delay; i++ {
-			firewall.Scan(false)
-		}
-
-		_, caught := firewall.Scan(true)
-		if !caught {
-			break
-		}
+		_, caught = firewall.Scan(delay, true)
 	}
 
 	return delay, nil
