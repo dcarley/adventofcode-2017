@@ -1,7 +1,9 @@
 package day02_test
 
 import (
-	"io/ioutil"
+	"bytes"
+	"io"
+	"os"
 
 	. "github.com/dcarley/adventofcode-2017/day02"
 
@@ -11,10 +13,19 @@ import (
 )
 
 var _ = Describe("Day02", func() {
+	var exampleInput io.Reader
+
+	BeforeEach(func() {
+		exampleInput = bytes.NewBuffer([]byte(`5 9 2 8
+9 4 7 3
+3 8 6 5`))
+	})
+
 	Describe("Part1", func() {
 		DescribeTable("example lines",
 			func(input []byte, expected int) {
-				checksum, err := Part1(input)
+				buf := bytes.NewBuffer(input)
+				checksum, err := Part1(buf)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(expected).To(Equal(checksum))
 			},
@@ -24,19 +35,16 @@ var _ = Describe("Day02", func() {
 		)
 
 		It("should solve example", func() {
-			input := []byte(`5 9 2 8
-9 4 7 3
-3 8 6 5`)
-			checksum, err := Part1(input)
+			checksum, err := Part1(exampleInput)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(checksum).To(Equal(18))
 		})
 
 		It("should solve puzzle input", func() {
-			input, err := ioutil.ReadFile("day02.input")
+			file, err := os.Open("day02.input")
 			Expect(err).ToNot(HaveOccurred())
 
-			checksum, err := Part1(input)
+			checksum, err := Part1(file)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(checksum).To(Equal(43074))
 		})
@@ -45,7 +53,8 @@ var _ = Describe("Day02", func() {
 	Describe("Part2", func() {
 		DescribeTable("example lines",
 			func(input []byte, expected int) {
-				checksum, err := Part2(input)
+				buf := bytes.NewBuffer(input)
+				checksum, err := Part2(buf)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(checksum).To(Equal(expected))
 			},
@@ -55,19 +64,16 @@ var _ = Describe("Day02", func() {
 		)
 
 		It("should solve example", func() {
-			input := []byte(`5 9 2 8
-9 4 7 3
-3 8 6 5`)
-			checksum, err := Part2(input)
+			checksum, err := Part2(exampleInput)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(checksum).To(Equal(9))
 		})
 
 		It("should solve puzzle input", func() {
-			input, err := ioutil.ReadFile("day02.input")
+			file, err := os.Open("day02.input")
 			Expect(err).ToNot(HaveOccurred())
 
-			checksum, err := Part2(input)
+			checksum, err := Part2(file)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(checksum).To(Equal(280))
 		})

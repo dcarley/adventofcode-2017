@@ -3,10 +3,11 @@ package day02
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"strconv"
 )
 
-func Part1(input []byte) (int, error) {
+func Part1(input io.Reader) (int, error) {
 	checksumFunc := func(nums []int) int {
 		var low, high *int
 
@@ -25,7 +26,7 @@ func Part1(input []byte) (int, error) {
 	return bothParts(input, checksumFunc)
 }
 
-func Part2(input []byte) (int, error) {
+func Part2(input io.Reader) (int, error) {
 	checksumFunc := func(nums []int) int {
 		for x, _ := range nums {
 			for y, _ := range nums {
@@ -45,10 +46,10 @@ func Part2(input []byte) (int, error) {
 	return bothParts(input, checksumFunc)
 }
 
-func bothParts(input []byte, checksumFunc func([]int) int) (int, error) {
+func bothParts(input io.Reader, checksumFunc func([]int) int) (int, error) {
 	var checksum int
 
-	tableScanner := bufio.NewScanner(bytes.NewBuffer(input))
+	tableScanner := bufio.NewScanner(input)
 	for tableScanner.Scan() {
 		lineScanner := bufio.NewScanner(bytes.NewBuffer(tableScanner.Bytes()))
 		lineScanner.Split(bufio.ScanWords)
