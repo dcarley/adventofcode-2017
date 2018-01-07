@@ -16,7 +16,8 @@ func Part1(list, lengths []int) int {
 	return list[0] * list[1]
 }
 
-func Part2(list []int, lengths []byte) string {
+func Part2(lengths []byte) []byte {
+	list := BuildList(256)
 	suffix := []byte{17, 31, 73, 47, 23}
 	lengths = append(lengths, suffix...)
 
@@ -38,7 +39,19 @@ func Part2(list []int, lengths []byte) string {
 		}
 	}
 
-	return hex.EncodeToString(denseHash)
+	hash := make([]byte, hex.EncodedLen(len(denseHash)))
+	hex.Encode(hash, denseHash)
+
+	return hash
+}
+
+func BuildList(size int) []int {
+	list := make([]int, size)
+	for i := 0; i < len(list); i++ {
+		list[i] = i
+	}
+
+	return list
 }
 
 func ReverseSublistWrapped(list []int, position, length int) {
