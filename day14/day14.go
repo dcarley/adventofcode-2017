@@ -27,11 +27,10 @@ func Part2(input []byte) int {
 	grid := NewGrid(input)
 
 	var regionID int
-	regions := map[Position]int{}
-
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[y]); x++ {
-			if grid[y][x] && grid.FindRegion(Position{x, y}, regions, regionID) {
+			if grid[y][x] {
+				grid.UnsetNeighbours(Position{x, y})
 				regionID++
 			}
 		}
@@ -83,16 +82,12 @@ func NewGrid(input []byte) Grid {
 	return grid
 }
 
-func (g Grid) FindRegion(position Position, seen map[Position]int, regionID int) (incrementID bool) {
-	if _, ok := seen[position]; ok {
-		return
-	}
+func (g *Grid) UnsetNeighbours(position Position) {
+	g[position.Y][position.X] = false
 
-	incrementID = true
-	seen[position] = regionID
 	for _, neighbour := range position.Neighbours() {
 		if g[neighbour.Y][neighbour.X] {
-			g.FindRegion(neighbour, seen, regionID)
+			g.UnsetNeighbours(neighbour)
 		}
 	}
 
