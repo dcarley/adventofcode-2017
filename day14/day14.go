@@ -2,6 +2,7 @@ package day14
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/dcarley/adventofcode-2017/day10"
 )
@@ -61,10 +62,17 @@ type Grid [Size][Size]bool
 
 func NewGrid(input []byte) Grid {
 	hashes := make([][]byte, Size)
+
+	wg := sync.WaitGroup{}
 	for i := 0; i < len(hashes); i++ {
-		suffix := fmt.Sprintf("-%d", i)
-		hashes[i] = day10.Part2(append(input, []byte(suffix)...))
+		wg.Add(1)
+		go func(index int) {
+			suffix := fmt.Sprintf("-%d", index)
+			hashes[index] = day10.Part2(append(input, []byte(suffix)...))
+			wg.Done()
+		}(i)
 	}
+	wg.Wait()
 
 	grid := Grid{}
 	for y, hash := range hashes {
