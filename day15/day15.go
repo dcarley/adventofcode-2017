@@ -12,12 +12,18 @@ func Generator(seed, factor, iterations, modFilter int) <-chan int {
 	results := make(chan int, Buffer)
 
 	go func() {
-		val := seed
 		defer close(results)
+		var (
+			i   int
+			val = seed
+		)
 
-		for i := 0; i < iterations; i++ {
+		for i < iterations {
 			val = (val * factor) % Product
-			results <- val
+			if val%modFilter == 0 {
+				results <- val
+				i++
+			}
 		}
 	}()
 
@@ -56,4 +62,13 @@ func Part1(a, b int) int {
 	}
 
 	return count
+}
+
+func Part2(a, b int) int {
+	const iterations = 5000000
+
+	chanA := Generator(a, FactorA, iterations, 4)
+	chanB := Generator(b, FactorB, iterations, 8)
+
+	return Judge(chanA, chanB)
 }

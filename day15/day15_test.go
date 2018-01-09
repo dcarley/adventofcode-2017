@@ -24,4 +24,14 @@ var _ = Describe("Day15", func() {
 			Expect(Part1(inputA, inputB)).To(Equal(577))
 		})
 	})
+
+	Describe("Part2", func() {
+		It("should solve example", func() {
+			Expect(Part2(exampleA, exampleB)).To(Equal(309))
+		})
+
+		It("should solve puzzle input", func() {
+			Expect(Part2(inputA, inputB)).To(Equal(316))
+		})
+	})
 })
