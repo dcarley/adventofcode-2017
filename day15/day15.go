@@ -46,8 +46,14 @@ func Judge(chanA, chanB <-chan int) int {
 func Part1(a, b int) int {
 	const iterations = 40000000
 
-	chanA := Generator(a, FactorA, iterations)
-	chanB := Generator(b, FactorB, iterations)
+	var count int
+	for i := 0; i < iterations; i++ {
+		a = (a * FactorA) % Product
+		b = (b * FactorB) % Product
+		if a&Mask == b&Mask {
+			count++
+		}
+	}
 
-	return Judge(chanA, chanB)
+	return count
 }
