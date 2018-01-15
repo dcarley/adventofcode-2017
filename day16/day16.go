@@ -5,39 +5,59 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strconv"
 	"unicode/utf8"
 )
 
 func Part1(input io.Reader) ([]byte, error) {
+	return bothParts(input, 1)
+}
+
+func Part2(input io.Reader) ([]byte, error) {
+	return bothParts(input, 1000000000)
+}
+
+func bothParts(input io.Reader, iterations int) ([]byte, error) {
 	programs := NewPrograms()
 
-	scanner := bufio.NewScanner(input)
-	scanner.Split(ScanCommas)
-	for scanner.Scan() {
-		instruction := scanner.Bytes()
-		switch instruction[0] {
-		case 's':
-			err := programs.Spin(instruction[1:])
-			if err != nil {
-				return []byte{}, err
+	buf, _ := ioutil.ReadAll(input)
+	reader := bytes.NewReader(buf)
+
+	for i := 0; i < iterations; i++ {
+		reader.Seek(0, io.SeekStart)
+		scanner := bufio.NewScanner(reader)
+		scanner.Split(ScanCommas)
+
+		for scanner.Scan() {
+			instruction := scanner.Bytes()
+			switch instruction[0] {
+			case 's':
+				err := programs.Spin(instruction[1:])
+				if err != nil {
+					return []byte{}, err
+				}
+			case 'x': // Exchange
+				err := programs.Exchange(instruction[1:])
+				if err != nil {
+					return []byte{}, err
+				}
+			case 'p': // Partner
+				err := programs.Partner(instruction[1:])
+				if err != nil {
+					return []byte{}, err
+				}
+			default:
+				return []byte{}, fmt.Errorf("unable to parse instruction: %s", instruction)
 			}
-		case 'x': // Exchange
-			err := programs.Exchange(instruction[1:])
-			if err != nil {
-				return []byte{}, err
-			}
-		case 'p': // Partner
-			err := programs.Partner(instruction[1:])
-			if err != nil {
-				return []byte{}, err
-			}
-		default:
-			return []byte{}, fmt.Errorf("unable to parse instruction: %s", instruction)
+		}
+
+		if err := scanner.Err(); err != nil {
+			return []byte{}, err
 		}
 	}
 
-	return programs, scanner.Err()
+	return programs, nil
 }
 
 // https://golang.org/src/bufio/scan.go?s=12782:12860#L374

@@ -35,4 +35,16 @@ var _ = Describe("Day16", func() {
 			Expect(result).To(Equal([]byte("pkgnhomelfdibjac")))
 		})
 	})
+
+	Describe("Part2", func() {
+		It("should solve puzzle input", func() {
+			file, err := os.Open("day16.input")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			result, err := Part2(file)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(Equal([]byte("")))
+		})
+	})
 })
