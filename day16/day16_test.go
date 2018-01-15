@@ -44,7 +44,7 @@ var _ = Describe("Day16", func() {
 
 			result, err := Part2(file)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(result).To(Equal([]byte("")))
+			Expect(result).To(Equal([]byte("pogbjfihclkemadn")))
 		})
 	})
 })

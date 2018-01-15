@@ -11,53 +11,75 @@ import (
 )
 
 func Part1(input io.Reader) ([]byte, error) {
-	return bothParts(input, 1)
+	programs := NewPrograms()
+	err := bothParts(programs, input)
+
+	return *programs, err
 }
 
 func Part2(input io.Reader) ([]byte, error) {
-	return bothParts(input, 1000000000)
-}
-
-func bothParts(input io.Reader, iterations int) ([]byte, error) {
-	programs := NewPrograms()
+	const iterations = 1000000000
 
 	buf, _ := ioutil.ReadAll(input)
 	reader := bytes.NewReader(buf)
 
-	for i := 0; i < iterations; i++ {
+	cycle := cycleSize(reader)
+	programs := NewPrograms()
+	for i := 0; i < iterations%cycle; i++ {
 		reader.Seek(0, io.SeekStart)
-		scanner := bufio.NewScanner(reader)
-		scanner.Split(ScanCommas)
-
-		for scanner.Scan() {
-			instruction := scanner.Bytes()
-			switch instruction[0] {
-			case 's':
-				err := programs.Spin(instruction[1:])
-				if err != nil {
-					return []byte{}, err
-				}
-			case 'x': // Exchange
-				err := programs.Exchange(instruction[1:])
-				if err != nil {
-					return []byte{}, err
-				}
-			case 'p': // Partner
-				err := programs.Partner(instruction[1:])
-				if err != nil {
-					return []byte{}, err
-				}
-			default:
-				return []byte{}, fmt.Errorf("unable to parse instruction: %s", instruction)
-			}
-		}
-
-		if err := scanner.Err(); err != nil {
-			return []byte{}, err
+		err := bothParts(programs, reader)
+		if err != nil {
+			return Programs{}, err
 		}
 	}
 
-	return programs, nil
+	return *programs, nil
+}
+
+func cycleSize(input io.ReadSeeker) int {
+	programs := NewPrograms()
+	seen := map[string]struct{}{}
+	for {
+		if _, ok := seen[string(*programs)]; ok {
+			break
+		}
+
+		seen[string(*programs)] = struct{}{}
+		input.Seek(0, io.SeekStart)
+		bothParts(programs, input)
+	}
+
+	return len(seen)
+}
+
+func bothParts(programs *Programs, input io.Reader) error {
+	scanner := bufio.NewScanner(input)
+	scanner.Split(ScanCommas)
+
+	for scanner.Scan() {
+		instruction := scanner.Bytes()
+		switch instruction[0] {
+		case 's':
+			err := programs.Spin(instruction[1:])
+			if err != nil {
+				return err
+			}
+		case 'x': // Exchange
+			err := programs.Exchange(instruction[1:])
+			if err != nil {
+				return err
+			}
+		case 'p': // Partner
+			err := programs.Partner(instruction[1:])
+			if err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unable to parse instruction: %s", instruction)
+		}
+	}
+
+	return scanner.Err()
 }
 
 // https://golang.org/src/bufio/scan.go?s=12782:12860#L374
@@ -79,13 +101,13 @@ func ScanCommas(data []byte, atEOF bool) (advance int, token []byte, err error) 
 
 type Programs []byte
 
-func NewPrograms() Programs {
-	programs := make([]byte, 16)
+func NewPrograms() *Programs {
+	programs := make(Programs, 16)
 	for i := 0; i < len(programs); i++ {
 		programs[i] = 'a' + byte(i)
 	}
 
-	return programs
+	return &programs
 }
 
 func (p *Programs) Spin(values []byte) error {
