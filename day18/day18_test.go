@@ -71,7 +71,7 @@ rcv d
 
 			res, err := Part2(file)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(res).To(Equal(-1))
+			Expect(res).To(Equal(7239))
 		})
 	})
 })

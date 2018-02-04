@@ -59,13 +59,13 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 		var value int
 		if inst.Value != "" {
 			var err error
-			value, err = strconv.Atoi(inst.Value)
+			value, err = strconv.Atoi(inst.Value) // raw value
 			if err != nil {
-				value = registers[inst.Value]
+				value = registers[inst.Value] // value from another register
 			}
 		}
 
-		var jumped bool
+		var jump bool
 		switch inst.Operation {
 		case "snd":
 			writer <- registers[inst.Register]
@@ -91,13 +91,18 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 		case "mod":
 			registers[inst.Register] %= value
 		case "jgz":
-			if registers[inst.Register] > 0 {
+			if v, ok := registers[inst.Register]; ok {
+				jump = v > 0 // raw value
+			} else if v, err := strconv.Atoi(inst.Register); err == nil {
+				jump = v > 0 // value from another register
+			}
+
+			if jump {
 				position += value
-				jumped = true
 			}
 		}
 
-		if !jumped {
+		if !jump {
 			position++
 		}
 		if position >= len(instructions) {
