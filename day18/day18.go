@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	Buffer  = 32
-	Timeout = 10 * time.Millisecond
+	Buffer  = 64
+	Timeout = 100 * time.Millisecond
 )
 
 type Instruction struct {
