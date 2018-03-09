@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -113,6 +112,18 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 	return
 }
 
+func ProxyCount(in <-chan int, out chan<- int) int {
+	defer close(out)
+
+	var count int
+	for val := range in {
+		count++
+		out <- val
+	}
+
+	return count
+}
+
 func Part1(input io.Reader) (int, error) {
 	instructions, err := Parse(input)
 	if err != nil {
@@ -137,26 +148,13 @@ func Part2(input io.Reader) (int, error) {
 	}
 
 	var (
-		count int
-		wg    sync.WaitGroup
 		chan0 = make(chan int, Buffer)
 		chan1 = make(chan int, Buffer)
 		proxy = make(chan int, Buffer)
 	)
 
-	wg.Add(1)
-	go func(in <-chan int, out chan<- int) {
-		for val := range in {
-			count++
-			out <- val
-		}
-		close(out)
-		wg.Done()
-	}(proxy, chan0)
-
 	go Run(instructions, 0, chan1, chan0)
 	go Run(instructions, 1, proxy, chan1)
-	wg.Wait()
 
-	return count, nil
+	return ProxyCount(proxy, chan0), nil
 }
