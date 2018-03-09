@@ -105,7 +105,7 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 			position++
 		}
 		if position >= len(instructions) {
-			break
+			done = true
 		}
 	}
 
