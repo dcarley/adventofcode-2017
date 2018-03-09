@@ -3,13 +3,14 @@ package day18
 import (
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"time"
 )
 
 const (
-	Buffer  = 64
-	Timeout = 100 * time.Millisecond
+	Buffer  = 256
+	Timeout = 10 * time.Millisecond
 )
 
 type Instruction struct {
@@ -41,6 +42,19 @@ func Parse(input io.Reader) ([]Instruction, error) {
 	return instructions, nil
 }
 
+func getRegisterOrRaw(value string, registers map[string]int) int {
+	if fromRegister, ok := registers[value]; ok {
+		return fromRegister
+	}
+
+	fromRaw, err := strconv.Atoi(value)
+	if err != nil {
+		log.Fatalf("unable to parse register value: %s", err)
+	}
+
+	return fromRaw
+}
+
 func Run(instructions []Instruction, programID int, writer chan<- int, reader <-chan int) {
 	defer close(writer)
 
@@ -54,20 +68,22 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 
 	for !done {
 		inst := instructions[position]
+		advance := 1
 
 		var value int
 		if inst.Value != "" {
-			var err error
-			value, err = strconv.Atoi(inst.Value) // raw value
-			if err != nil {
+			if v, err := strconv.Atoi(inst.Value); err == nil {
+				value = v // raw value
+			} else {
 				value = registers[inst.Value] // value from another register
 			}
 		}
 
-		var jump bool
 		switch inst.Operation {
 		case "snd":
-			writer <- registers[inst.Register]
+			if v := getRegisterOrRaw(inst.Register, registers); v > 0 {
+				writer <- v
+			}
 		case "rcv":
 			if reader != nil {
 				select {
@@ -77,7 +93,7 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 					done = true
 				}
 			} else {
-				if v, ok := registers[inst.Register]; ok && v > 0 {
+				if v := getRegisterOrRaw(inst.Register, registers); v > 0 {
 					done = true
 				}
 			}
@@ -90,20 +106,12 @@ func Run(instructions []Instruction, programID int, writer chan<- int, reader <-
 		case "mod":
 			registers[inst.Register] %= value
 		case "jgz":
-			if v, ok := registers[inst.Register]; ok {
-				jump = v > 0 // raw value
-			} else if v, err := strconv.Atoi(inst.Register); err == nil {
-				jump = v > 0 // value from another register
-			}
-
-			if jump {
-				position += value
+			if v := getRegisterOrRaw(inst.Register, registers); v > 0 {
+				advance = value
 			}
 		}
 
-		if !jump {
-			position++
-		}
+		position += advance
 		if position >= len(instructions) {
 			done = true
 		}
