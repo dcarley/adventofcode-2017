@@ -41,4 +41,22 @@ var _ = Describe("Day19", func() {
 			Expect(res).To(Equal("ITSZCJNMUO"))
 		})
 	})
+
+	Describe("Part2", func() {
+		It("should solve example", func() {
+			res, err := Part2(exampleInput)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res).To(Equal(38))
+		})
+
+		It("should solve puzzle input", func() {
+			file, err := os.Open("day19.input")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			res, err := Part2(file)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res).To(Equal(17420))
+		})
+	})
 })

@@ -79,8 +79,11 @@ func MoveToStart(diagram Diagram) (Position, error) {
 
 // MoveToEnd moves along the diagram, collecting letters, until it reaches
 // the edge of the diagram or an empty cell.
-func MoveToEnd(position Position, diagram Diagram) ([]byte, error) {
-	var letters []byte
+func MoveToEnd(position Position, diagram Diagram) ([]byte, int, error) {
+	var (
+		letters []byte
+		moves   int
+	)
 
 	for diagram.InBounds(position) && diagram.At(position) != CharEmpty {
 		if char := diagram.At(position); char >= 'A' && char <= 'Z' {
@@ -90,15 +93,16 @@ func MoveToEnd(position Position, diagram Diagram) ([]byte, error) {
 		if diagram.At(position) == CharJunction {
 			bearing, err := FindNewBearing(position, diagram)
 			if err != nil {
-				return []byte{}, err
+				return []byte{}, 0, err
 			}
 			position.Bearing = bearing
 		}
 
 		position.Move()
+		moves++
 	}
 
-	return letters, nil
+	return letters, moves, nil
 }
 
 // FindNewBearing finds a new direction to travel after encountering a
@@ -125,21 +129,31 @@ func FindNewBearing(position Position, diagram Diagram) (Bearing, error) {
 	return Bearing{}, errors.New("unable to find new bearing")
 }
 
-func Part1(input io.Reader) (string, error) {
+func allParts(input io.Reader) (string, int, error) {
 	diagram, err := Parse(input)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	position, err := MoveToStart(diagram)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	letters, err := MoveToEnd(position, diagram)
+	letters, moves, err := MoveToEnd(position, diagram)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return fmt.Sprintf("%s", letters), nil
+	return fmt.Sprintf("%s", letters), moves, nil
+}
+
+func Part1(input io.Reader) (string, error) {
+	letters, _, err := allParts(input)
+	return letters, err
+}
+
+func Part2(input io.Reader) (int, error) {
+	_, moves, err := allParts(input)
+	return moves, err
 }
