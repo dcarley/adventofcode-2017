@@ -13,17 +13,22 @@ import (
 )
 
 var _ = Describe("Day20", func() {
-	var exampleInput io.Reader
+	var exampleInputPart1, exampleInputPart2 io.Reader
 
 	BeforeEach(func() {
-		exampleInput = bytes.NewBuffer([]byte(`p=<3,0,0>, v=<2,0,0>, a=<-1,0,0>
+		exampleInputPart1 = bytes.NewBuffer([]byte(`p=<3,0,0>, v=<2,0,0>, a=<-1,0,0>
 p=<4,0,0>, v=<0,0,0>, a=<-2,0,0>
+`))
+		exampleInputPart2 = bytes.NewBuffer([]byte(`p=<-6,0,0>, v=<3,0,0>, a=<0,0,0>
+p=<-4,0,0>, v=<2,0,0>, a=<0,0,0>
+p=<-2,0,0>, v=<1,0,0>, a=<0,0,0>
+p=<3,0,0>, v=<-1,0,0>, a=<0,0,0>
 `))
 	})
 
 	DescribeTable("Particle tick",
 		func(ticks int, positions []Coord) {
-			particles, err := Parse(exampleInput)
+			particles, err := Parse(exampleInputPart1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(particles).To(HaveLen(len(positions)))
 
@@ -45,7 +50,7 @@ p=<4,0,0>, v=<0,0,0>, a=<-2,0,0>
 
 	Describe("Part1", func() {
 		It("should solve example", func() {
-			res, err := Part1(exampleInput)
+			res, err := Part1(exampleInputPart1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(res).To(Equal(0))
 		})
@@ -58,6 +63,24 @@ p=<4,0,0>, v=<0,0,0>, a=<-2,0,0>
 			res, err := Part1(file)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(res).To(Equal(344))
+		})
+	})
+
+	Describe("Part2", func() {
+		It("should solve example", func() {
+			res, err := Part2(exampleInputPart2)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res).To(Equal(1))
+		})
+
+		It("should solve puzzle input", func() {
+			file, err := os.Open("day20.input")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			res, err := Part2(file)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res).To(Equal(404))
 		})
 	})
 })

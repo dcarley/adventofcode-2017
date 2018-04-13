@@ -6,11 +6,14 @@ import (
 	"math"
 )
 
+const MaxTicks = 1000
+
 type Coord struct {
 	X, Y, Z int
 }
 type Particle struct {
 	Position, Velocity, Acceleration Coord
+	Destroyed                        bool
 }
 
 func (p *Particle) Tick() {
@@ -60,21 +63,12 @@ type Score struct {
 	Found bool
 }
 
-func Part1(input io.Reader) (int, error) {
-	particles, err := Parse(input)
-	if err != nil {
-		return -1, err
-	}
-
-	const ticks = 1000
-	for tick := 0; tick < ticks; tick++ {
-		for i := 0; i < len(particles); i++ {
-			particles[i].Tick()
-		}
-	}
-
+func Nearest(particles []Particle) int {
 	score := Score{}
 	for i := 0; i < len(particles); i++ {
+		if particles[i].Destroyed {
+			continue
+		}
 		if dist := particles[i].Distance(); dist < score.Value || !score.Found {
 			score.Index = i
 			score.Value = dist
@@ -82,5 +76,55 @@ func Part1(input io.Reader) (int, error) {
 		}
 	}
 
-	return score.Index, nil
+	return score.Index
+}
+
+func Part1(input io.Reader) (int, error) {
+	particles, err := Parse(input)
+	if err != nil {
+		return -1, err
+	}
+
+	for tick := 0; tick < MaxTicks; tick++ {
+		for i := 0; i < len(particles); i++ {
+			particles[i].Tick()
+		}
+	}
+
+	return Nearest(particles), nil
+}
+
+func Part2(input io.Reader) (int, error) {
+	particles, err := Parse(input)
+	if err != nil {
+		return -1, err
+	}
+
+	for tick := 0; tick < MaxTicks; tick++ {
+		positions := map[Coord]*Particle{}
+		for i := 0; i < len(particles); i++ {
+			if particles[i].Destroyed {
+				continue
+			}
+
+			particles[i].Tick()
+
+			position := particles[i].Position
+			if existing, collided := positions[position]; collided {
+				existing.Destroyed = true
+				particles[i].Destroyed = true
+			} else {
+				positions[position] = &particles[i]
+			}
+		}
+	}
+
+	var notDestroyed int
+	for i := 0; i < len(particles); i++ {
+		if !particles[i].Destroyed {
+			notDestroyed++
+		}
+	}
+
+	return notDestroyed, nil
 }
