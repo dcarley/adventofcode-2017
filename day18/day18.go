@@ -10,7 +10,7 @@ import (
 
 const (
 	Buffer  = 256
-	Timeout = 10 * time.Millisecond
+	Timeout = 100 * time.Millisecond
 )
 
 type Instruction struct {
