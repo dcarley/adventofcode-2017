@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	. "github.com/dcarley/adventofcode-2017/day16"
+	. "github.com/dcarley/adventofcode/2017/day16"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

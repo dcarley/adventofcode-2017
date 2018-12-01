@@ -1,7 +1,7 @@
 package day03_test
 
 import (
-	. "github.com/dcarley/adventofcode-2017/day03"
+	. "github.com/dcarley/adventofcode/2017/day03"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dcarley/adventofcode-2017/day10"
+	"github.com/dcarley/adventofcode/2017/day10"
 )
 
 const Size = 128

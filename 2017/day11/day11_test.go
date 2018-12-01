@@ -3,7 +3,7 @@ package day11_test
 import (
 	"io/ioutil"
 
-	. "github.com/dcarley/adventofcode-2017/day11"
+	. "github.com/dcarley/adventofcode/2017/day11"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

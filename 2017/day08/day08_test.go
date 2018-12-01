@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	. "github.com/dcarley/adventofcode-2017/day08"
+	. "github.com/dcarley/adventofcode/2017/day08"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

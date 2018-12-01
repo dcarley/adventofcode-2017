@@ -1,7 +1,7 @@
 package day15_test
 
 import (
-	. "github.com/dcarley/adventofcode-2017/day15"
+	. "github.com/dcarley/adventofcode/2017/day15"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

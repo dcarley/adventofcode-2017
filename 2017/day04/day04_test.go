@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"os"
 
-	. "github.com/dcarley/adventofcode-2017/day04"
+	. "github.com/dcarley/adventofcode/2017/day04"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

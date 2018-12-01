@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/dcarley/adventofcode-2017
+    working_directory: /go/src/github.com/dcarley/adventofcode
     docker:
       - image: circleci/golang:1.10
     steps:

@@ -3,7 +3,7 @@ package day06_test
 import (
 	"os"
 
-	. "github.com/dcarley/adventofcode-2017/day06"
+	. "github.com/dcarley/adventofcode/2017/day06"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
