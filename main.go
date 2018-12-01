@@ -16,19 +16,19 @@ func main() {
 	placeHolder := flag.String("p", "SKELETON", "Placeholder string")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: %s <DAY_NUMBER>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "usage: %s <YEAR_NUMBER> <DAY_NUMBER>\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.Parse()
 
-	dayNumber := flag.Arg(0)
-	if dayNumber == "" {
+	yearNumber, dayNumber := flag.Arg(0), flag.Arg(1)
+	if yearNumber == "" || dayNumber == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
 
-	destDir := "day" + dayNumber
-	err := os.Mkdir(destDir, 0755)
+	destDir := fmt.Sprintf("%s/day%s", yearNumber, dayNumber)
+	err := os.MkdirAll(destDir, 0755)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -52,12 +52,11 @@ func main() {
 			log.Fatalln(err)
 		}
 
+		contents = bytes.Replace(contents, []byte("{{year}}"), []byte(yearNumber), -1)
+		contents = bytes.Replace(contents, []byte("{{day}}"), []byte(dayNumber), -1)
+
 		fmt.Println(sourcePath, "->", destPath)
-		err = ioutil.WriteFile(
-			destPath,
-			bytes.Replace(contents, []byte(*placeHolder), []byte(dayNumber), -1),
-			0644,
-		)
+		err = ioutil.WriteFile(destPath, contents, 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}

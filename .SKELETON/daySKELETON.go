@@ -1,4 +1,4 @@
-package daySKELETON
+package day{{day}}
 
 import "io"
 

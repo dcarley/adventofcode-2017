@@ -1,4 +1,4 @@
-package daySKELETON_test
+package day{{day}}_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestDaySKELETON(t *testing.T) {
+func TestDay{{day}}(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "DaySKELETON Suite")
+	RunSpecs(t, "{{year}} Day{{day}} Suite")
 }

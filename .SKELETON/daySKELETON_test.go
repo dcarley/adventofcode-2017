@@ -1,18 +1,18 @@
-package daySKELETON_test
+package day{{day}}_test
 
 import (
 	"bytes"
 	"io"
 	"os"
 
-	. "github.com/dcarley/adventofcode-2017/daySKELETON"
+	. "github.com/dcarley/adventofcode/{{year}}/day{{day}}"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DaySKELETON", func() {
+var _ = Describe("Day{{day}}", func() {
 	var exampleInput io.Reader
 
 	BeforeEach(func() {
@@ -36,7 +36,7 @@ var _ = Describe("DaySKELETON", func() {
 		})
 
 		It("should solve puzzle input", func() {
-			file, err := os.Open("daySKELETON.input")
+			file, err := os.Open("day{{day}}.input")
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
 
