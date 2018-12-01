@@ -9,5 +9,5 @@ import (
 
 func TestDay14(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Day14 Suite")
+	RunSpecs(t, "2017 Day14 Suite")
 }
