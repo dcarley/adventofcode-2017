@@ -2,6 +2,7 @@ package day02
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 )
 
@@ -33,8 +34,45 @@ func Part1(input io.Reader) (int, error) {
 	}
 	if err := scanner.Err(); err != nil {
 		return 0, err
-
 	}
 
 	return count.two * count.three, nil
+}
+
+func Part2(input io.Reader) (string, error) {
+	var ids []string
+
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		ids = append(ids, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	for a := range ids {
+		for b := range ids {
+			if a == b {
+				continue
+			}
+
+			if len(ids[a]) != len(ids[b]) {
+				return "", fmt.Errorf("different length ids: %s, %s", ids[a], ids[b])
+			}
+
+			var diff []int
+			for i := 0; i < len(ids[a]); i++ {
+				if ids[a][i] != ids[b][i] {
+					diff = append(diff, i)
+				}
+			}
+
+			if len(diff) == 1 {
+				i := diff[0]
+				return ids[a][:i] + ids[a][i+1:], nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no matching ids found")
 }
